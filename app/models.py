@@ -1,6 +1,9 @@
 from datetime import datetime
-from app import db, login_manager
+from app import db, login_manager, bcrypt 
 from flask_login import UserMixin
+from config import Config
+
+from itsdangerous import URLSafeTimedSerializer
 
 
 
@@ -14,16 +17,28 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-def set_password(self, password, bcrypt):
-    self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+    def set_password(self, raw_password):
+        self.password_hash = bcrypt.generate_password_hash(raw_password).decode('utf-8')
 
 
-def check_password(self, password, bcrypt):
-    return bcrypt.check_password_hash(self.password_hash, password)
+    def check_password(self, raw_password):
+        return bcrypt.check_password_hash(self.password_hash, raw_password)
+    
+    def get_reset_token(user_id, expires_sec=1800):
+        s = URLSafeTimedSerializer(Config.SECRET_KEY)
+        return s.dumps({'user_id': user_id})
+
+    def verify_reset_token(token, expires_sec=1800):
+        s = URLSafeTimedSerializer(Config.SECRET_KEY)
+        try:
+            user_id = s.loads(token, max_age=expires_sec)['user_id']
+        except:
+            return None
+        return user_id
 
 
-def __repr__(self):
-    return f"<User {self.username}>"
+    def __repr__(self):
+        return f"<User {self.username}>"
 
 
 
@@ -41,7 +56,7 @@ class Issue(db.Model):
     title = db.Column(db.String(120), nullable=False)
     machine_name = db.Column(db.String(100))
     # description = db.Column(db.Text)
-    solution = db.Column(db.text)
+    solution = db.Column(db.Text)
     # status = db.Column(db.String(20), default='open')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

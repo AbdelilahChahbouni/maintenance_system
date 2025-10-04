@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>All Issues</h2>
+<a class="btn btn-primary mb-3" href="{{ url_for('issues.new_issue') }}">+ Add Issue</a>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Solution</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for issue in issues %}
+    <tr>
+      <td>{{ issue.title }}</td>
+      <td>{{ issue.description }}</td>
+      <td>{{ issue.solution }}</td>
+      <td>
+        <a href="{{ url_for('issues.edit_issue', issue_id=issue.id) }}" class="btn btn-sm btn-warning">Edit</a>
+        <form action="{{ url_for('issues.delete_issue', issue_id=issue.id) }}" method="POST" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
