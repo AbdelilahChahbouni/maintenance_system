@@ -7,15 +7,22 @@
   <thead>
     <tr>
       <th>Title</th>
+      <th>Machine</th>
       <th>Description</th>
       <th>Solution</th>
       <th>Actions</th>
+
     </tr>
   </thead>
   <tbody>
     {% for issue in issues %}
     <tr>
-      <td>{{ issue.title }}</td>
+      <td>
+         <a href="{{ url_for('issues.issue_detail', issue_id=issue.id) }}">
+            {{ issue.title }}
+          </a>
+      </td>
+      <td>{{ issue.machine_name }}</td>
       <td>{{ issue.description }}</td>
       <td>{{ issue.solution }}</td>
       <td>

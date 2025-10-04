@@ -55,7 +55,7 @@ class Issue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     machine_name = db.Column(db.String(100))
-    # description = db.Column(db.Text)
+    description = db.Column(db.Text)
     solution = db.Column(db.Text)
     # status = db.Column(db.String(20), default='open')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -65,7 +65,14 @@ class Issue(db.Model):
 class SparePart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    part_number = db.Column(db.String(50), unique=True, nullable=False)
     quantity = db.Column(db.Integer, default=0)
+    location = db.Column(db.String(100))   # e.g. Warehouse A - Shelf B
+    description = db.Column(db.Text)
+
+    def __repr__(self):
+        return f"<SparePart {self.name}>"
+
 
 
 class StockTransaction(db.Model):
