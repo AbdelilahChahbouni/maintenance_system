@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Use Spare Part</h2>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">
+    {{ form.machine_name.label }} {{ form.machine_name(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.part_id.label }} {{ form.part_id(class="form-control") }}
+  </div>
+  <div class="mb-3">
+    {{ form.quantity_used.label }} {{ form.quantity_used(class="form-control") }}
+  </div>
+  <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+</form>
+{% endblock %}

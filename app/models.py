@@ -74,17 +74,36 @@ class SparePart(db.Model):
         return f"<SparePart {self.name}>"
 
 
-
-class StockTransaction(db.Model):
+class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    part_id = db.Column(db.Integer, db.ForeignKey('spare_part.id'))
-    quantity = db.Column(db.Integer)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    part_id = db.Column(db.Integer, db.ForeignKey("spare_part.id"), nullable=False)
+    machine_name = db.Column(db.String(120), nullable=False)
+    quantity_used = db.Column(db.Integer, nullable=False)
+    date_used = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Track who made the transaction
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    part = db.relationship("SparePart", backref="transactions", lazy=True)
+    user = db.relationship("User", backref="transactions", lazy=True)
+
+
+from datetime import datetime
+from app import db
 
 class ConsumableUsage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    part_id = db.Column(db.Integer, db.ForeignKey('spare_part.id'))
-    quantity_used = db.Column(db.Integer)
-    machine_name = db.Column(db.String(100))
+    consumable_name = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
     date_used = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # relations
+    machine_id = db.Column(db.Integer, db.ForeignKey("machine.id"), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    # relationships
+    machine = db.relationship("Machine", backref="consumables", lazy=True)
+    user = db.relationship("User", backref="consumables", lazy=True)
+
+    def __repr__(self):
+        return f"<Consumable {self.consumable_name} - {self.quantity}>"

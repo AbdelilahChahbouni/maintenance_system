@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Spare Part Transactions</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Part</th>
+      <th>Machine</th>
+      <th>Quantity Used</th>
+      <th>User</th>
+      <th>Actions</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in transactions %}
+    <tr>
+      <td>{{ t.date_used.strftime("%Y-%m-%d %H:%M") }}</td>
+      <td>{{ t.part.name }}</td>
+      <td>{{ t.machine_name }}</td>
+      <td>{{ t.quantity_used }}</td>
+      <td>{{ t.user.username }}</td>
+      <td>
+          <a href="{{ url_for('stock.edit_stock_out', transaction_id=t.id) }}" class="btn btn-sm btn-warning">Edit</a>
+          <form action="{{ url_for('stock.delete_stock_out', transaction_id=t.id) }}" method="POST" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+      </td>
+
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+

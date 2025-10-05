@@ -1,5 +1,5 @@
 from app import create_app, db
-from app.models import User, Issue, SparePart, StockTransaction, ConsumableUsage
+from app.models import User, Issue, SparePart, Transaction, ConsumableUsage
 
 app = create_app()
 
@@ -10,6 +10,6 @@ def make_shell_context():
     'User': User,
     'Issue': Issue,
     'SparePart': SparePart,
-    'StockTransaction': StockTransaction,
+    'StockTransaction': Transaction,
     'ConsumableUsage': ConsumableUsage,
     }
