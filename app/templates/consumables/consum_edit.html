@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit Consumable Usage</h2>
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <div class="mb-3">{{ form.consumable_name.label }} {{ form.consumable_name(class="form-control") }}</div>
+  <div class="mb-3">{{ form.quantity.label }} {{ form.quantity(class="form-control") }}</div>
+  <div class="mb-3">{{ form.machine_id.label }} {{ form.machine_id(class="form-control") }}</div>
+  <button type="submit" class="btn btn-success">Update</button>
+</form>
+{% endblock %}

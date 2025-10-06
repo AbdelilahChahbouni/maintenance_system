@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Consumables Log</h2>
+<a class="btn btn-primary mb-3" href="{{ url_for('consumables.new_consumable') }}">+ Log Consumable</a>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Consumable</th>
+      <th>Quantity</th>
+      <th>Machine</th>
+      <th>User</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in consumables %}
+    <tr>
+      <td>{{ c.date_used.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ c.consumable_name }}</td>
+      <td>{{ c.quantity }}</td>
+      <td>{{ c.machine.name if c.machine else "-" }}</td>
+      <td>{{ c.user.username }}</td>
+     
+        <td>
+          <a href="{{ url_for('consumables.edit_consumable', usage_id=c.id) }}" class="btn btn-sm btn-warning">Edit</a>
+          <form method="POST" action="{{ url_for('consumables.delete_consumable', usage_id=c.id) }}" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

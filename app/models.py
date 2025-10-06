@@ -48,6 +48,14 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+class Machine(db.Model):
+    __tablename__ = "machine"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    location = db.Column(db.String(100))
+
+    def __repr__(self):
+        return f"<Machine {self.name}>"
 
 
 # Placeholder models for shell context and later weeks
@@ -87,9 +95,6 @@ class Transaction(db.Model):
     part = db.relationship("SparePart", backref="transactions", lazy=True)
     user = db.relationship("User", backref="transactions", lazy=True)
 
-
-from datetime import datetime
-from app import db
 
 class ConsumableUsage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
