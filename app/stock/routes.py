@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request 
 from app import db
-from app.models import SparePart , Transaction 
+from app.models import SparePart , Transaction , Machine 
 from .forms import SparePartForm , TransactionForm
 from flask_login import current_user , login_required
 
@@ -62,6 +62,7 @@ def delete_stock(part_id):
 # @login_required
 def stock_out():
     form = TransactionForm()
+    form.machine_name.choices = [(m.id, m.name) for m in Machine.query.all()]
     if form.validate_on_submit():
         part = SparePart.query.get_or_404(form.part_id.data)
         if form.quantity_used.data > part.quantity:

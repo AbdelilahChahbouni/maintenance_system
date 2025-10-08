@@ -44,17 +44,20 @@ def create_app(config_class=Config):
 
     # Blueprints
     from app.auth.routes import auth
-    # from app.main.routes import main
+    from app.main.routes import main
     from app.issues.routes import issues
     from app.consumables.routes import consumables
     from app.stock.routes import stock
+    from app.machines.routes import machines
 
 
     app.register_blueprint(auth)
-    # app.register_blueprint(main)
+    app.register_blueprint(main)
     app.register_blueprint(issues)
     app.register_blueprint(consumables)
     app.register_blueprint(stock)
+    app.register_blueprint(machines)
+
 
 
     return app

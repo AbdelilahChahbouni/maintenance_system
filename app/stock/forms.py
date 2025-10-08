@@ -14,7 +14,7 @@ class SparePartForm(FlaskForm):
 
 class TransactionForm(FlaskForm):
     part_id = SelectField("Select Part", coerce=int, validators=[DataRequired()])
-    machine_name = StringField("Machine Name", validators=[DataRequired()])
+    machine_name = SelectField("Machine", coerce=int, choices=[])
     quantity_used = IntegerField("Quantity Used", validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField("Record Transaction")
 

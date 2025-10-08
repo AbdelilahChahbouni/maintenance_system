@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Machines</h2>
+<a href="{{ url_for('machines.new_machine') }}" class="btn btn-primary mb-3">+ Add Machine</a>
+<table class="table table-striped">
+  <thead>
+    <tr><th>Name</th>
+    <th>Location</th>
+    <th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for m in machines %}
+    <tr>
+      <td>{{ m.name }}</td>
+      <td>{{ m.location }}</td>
+      <td>
+        <a href="{{ url_for('machines.edit_machine', id=m.id) }}" class="btn btn-sm btn-warning">Edit</a>
+        <form action="{{ url_for('machines.delete_machine', id=m.id) }}" method="POST" style="display:inline;">
+          <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this machine?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

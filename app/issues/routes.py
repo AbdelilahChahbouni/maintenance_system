@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request , Blueprint
 from app import db
-from app.models import Issue
+from app.models import Issue , Machine
 from .forms import IssueForm
 
 
@@ -19,9 +19,10 @@ def issue_detail(issue_id):
 
 @issues.route("/issues/new", methods=["GET", "POST"])
 def new_issue():
-    print("befor")
+   
     form = IssueForm()
-    print('ok')
+    form.machine_name.choices = [(m.id, m.name) for m in Machine.query.all()]
+   
     if form.validate_on_submit():
         issue = Issue(
             title=form.title.data,

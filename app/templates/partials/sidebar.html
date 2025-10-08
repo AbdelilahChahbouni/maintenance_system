@@ -14,7 +14,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href={{url_for('main.dashboard')}}>
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
@@ -23,9 +23,9 @@
             <hr class="sidebar-divider">
 
             <!-- Heading -->
-            <div class="sidebar-heading">
+            <!-- <div class="sidebar-heading">
                 Interface
-            </div>
+            </div> -->
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
@@ -37,8 +37,8 @@
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <!-- <h6 class="collapse-header">Custom Components:</h6> -->
-                        <a class="collapse-item" href="buttons.html">Add Issue</a>
-                        <a class="collapse-item" href="cards.html">List Issues</a>
+                        <a class="collapse-item" href={{url_for('issues.new_issue')}}>Add Issue</a>
+                        <a class="collapse-item" href={{url_for('issues.issues_list')}}>List Issues</a>
                     </div>
                 </div>
             </li>
@@ -54,55 +54,69 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <!-- <h6 class="collapse-header">Custom Utilities:</h6> -->
-                        <a class="collapse-item" href="utilities-color.html">List Stocks</a>
-                        <a class="collapse-item" href="utilities-border.html">Add Item to stock</a>
-                        <a class="collapse-item" href="utilities-animation.html">Lits Stocks out</a>
-                        <a class="collapse-item" href="utilities-other.html">Add Item out from stock</a>
+                        <a class="collapse-item" href={{url_for('stock.list_stock')}}>List Stocks</a>
+                        <a class="collapse-item" href={{url_for('stock.add_stock')}}>Add Item to stock</a>
+                        <a class="collapse-item" href={{url_for('stock.stock_out_list')}}>Lits Stocks out</a>
+                        <a class="collapse-item" href={{url_for('stock.stock_out')}}>Add Item out from stock</a>
                     </div>
                 </div>
             </li>
-
+            <!-- consumables item -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
+                    aria-expanded="true" aria-controls="collapseThree">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Consumables Parts</span>
                 </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseThree" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <!-- <h6 class="collapse-header">Custom Components:</h6> -->
-                        <a class="collapse-item" href="buttons.html">Add Consumable</a>
-                        <a class="collapse-item" href="cards.html">List Consumables</a>
+                        <a class="collapse-item" href={{url_for('consumables.list_consumables')}}>List Consumable</a>
+                        <a class="collapse-item" href={{url_for('consumables.new_consumable')}}>Add Consumables</a>
                     </div>
                 </div>
             </li>
-
+            <!-- machines item -->
+              <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour"
+                    aria-expanded="true" aria-controls="collapseThree">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Machines</span>
+                </a>
+                <div id="collapseFour" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <!-- <h6 class="collapse-header">Custom Components:</h6> -->
+                        <a class="collapse-item" href={{url_for('machines.list_machines')}}>List machines</a>
+                        <a class="collapse-item" href={{url_for('machines.new_machine')}}>Add machine</a>
+                    </div>
+                </div>
+            </li>
             <!-- Divider -->
             <hr class="sidebar-divider">
 
             <!-- Heading -->
-            <div class="sidebar-heading">
+            <!-- <div class="sidebar-heading">
                 Addons
-            </div>
+            </div> -->
 
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true"
                     aria-controls="collapsePages">
                     <i class="fas fa-fw fa-folder"></i>
-                    <span>Pages</span>
+                    <span>Account</span>
                 </a>
-                <div id="collapsePages" class="collapse show" aria-labelledby="headingPages"
+                <div id="collapsePages" class="collapse " aria-labelledby="headingPages"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Login Screens:</h6>
+                        <!-- <h6 class="collapse-header">Login Screens:</h6> -->
                         <a class="collapse-item" href="login.html">Login</a>
                         <a class="collapse-item" href="register.html">Register</a>
                         <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
                         <div class="collapse-divider"></div>
-                        <h6 class="collapse-header">Other Pages:</h6>
+                        <!-- <h6 class="collapse-header">Other Pages:</h6>
                         <a class="collapse-item" href="404.html">404 Page</a>
-                        <a class="collapse-item active" href="blank.html">Blank Page</a>
+                        <a class="collapse-item active" href="blank.html">Blank Page</a> -->
                     </div>
                 </div>
             </li>
