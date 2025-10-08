@@ -21,16 +21,20 @@ def register():
     # check existing user
         if User.query.filter((User.username==form.username.data)|(User.email==form.email.data)).first():
             flash('Username or email already exists', 'danger')
+            print('Username or email already exists')
             return render_template('auth/register.html', form=form)
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created. You can now login.', 'success')
+        print('Your account has been created. You can now login., success')
         return redirect(url_for('auth.login'))
+    print('form not ok')
     return render_template('auth/register.html', form=form)
 
 @auth.route('/login', methods=['GET','POST'])
+@auth.route('/', methods=['GET','POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("auth.home"))  # redirect logged-in users
@@ -43,7 +47,7 @@ def login():
 
             # Redirect to next page if user tried to access a protected route
             next_page = request.args.get("next")
-            return redirect(next_page) if next_page else redirect(url_for("auth.home"))
+            return redirect(next_page) if next_page else redirect(url_for("main.dashboard"))
         else:
             flash("Login failed. Please check your email and password.", "danger")
 
