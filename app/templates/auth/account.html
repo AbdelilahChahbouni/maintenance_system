@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    
+    <!-- Left Card: Update Profile Form -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Update Profile</h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group mb-3 text-center">
+              <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}"
+                   alt="Profile Picture"
+                   class="rounded-circle mb-2"
+                   width="120" height="120">
+              <div>
+                {{ form.picture.label(class="form-label") }}
+                {{ form.picture(class="form-control") }}
+                {% for error in form.picture.errors %}
+                  <small class="text-danger">{{ error }}</small>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              {{ form.username.label(class="form-label") }}
+              {{ form.username(class="form-control") }}
+            </div>
+
+            <div class="form-group mb-3">
+              {{ form.first_name.label(class="form-label") }}
+              {{ form.first_name(class="form-control") }}
+            </div>
+
+            <div class="form-group mb-3">
+              {{ form.last_name.label(class="form-label") }}
+              {{ form.last_name(class="form-control") }}
+            </div>
+
+            <div class="form-group mb-3">
+              {{ form.email.label(class="form-label") }}
+              {{ form.email(class="form-control") }}
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">{{ form.submit.label }}</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Card: Display User Info -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">Profile Information</h5>
+        </div>
+        <div class="card-body text-center">
+          <img src="{{ url_for('static', filename='profile_pics/' + current_user.image_file) }}"
+               alt="User Profile"
+               class="rounded-circle mb-3"
+               width="120" height="120">
+
+          <h5 class="mb-1">{{ current_user.username }}</h5>
+          <p class="text-muted mb-1">{{ current_user.email }}</p>
+          <p class="mb-1"><strong>First name:</strong> {{ current_user.first_name or 'Not set' }}</p>
+          <p class="mb-1"><strong>Last name:</strong> {{ current_user.last_name or 'Not set' }}</p>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request
 from app import db, bcrypt 
-from app.auth.forms import RegistrationForm, LoginForm , ResetPasswordForm , RequestResetForm
+from app.auth.forms import RegistrationForm, LoginForm , ResetPasswordForm , RequestResetForm , UpdateAccountForm
 from app.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from app import mail
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from .utils import save_picture
 
 auth = Blueprint('auth', __name__, template_folder='templates/auth')
 
@@ -54,9 +55,31 @@ def login():
     return render_template("auth/login.html", form=form)
 
 
-@auth.route('/home' , methods=['GET'])
-def home():
-    return render_template('main/home.html')
+@auth.route('/account' , methods=['GET' , 'POST'])
+def account():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+
+        db.session.commit()
+        flash('Your profile has been updated!', 'success')
+        return redirect(url_for('auth.account'))
+    elif request.method == 'GET':
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('auth/account.html', title='Account',
+                           image_file=image_file, form=form)
 
 
 @auth.route("/logout")
