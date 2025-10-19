@@ -92,8 +92,10 @@
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>Title</th>
                   <th>Machine</th>
                   <th>Description</th>
+                  <th>Solution</th>
                   <th>Reported By</th>
                   <th>Date</th>
                 </tr>
@@ -102,13 +104,15 @@
                 {% for issue in recent_issues %}
                 <tr>
                   <td>{{ issue.id }}</td>
-                  <td>{{ issue.machine_name if issue.machine_name else '-' }}</td>
+                  <td>{{issue.title}}</td>
+                  <td>{{ issue.machine.name if issue.machine.name else '-' }}</td>
                   <td>{{ issue.description }}</td>
-                  <td>{{ issue.user_id.username }}</td>
+                  <th>{{issue.solution}}</th>
+                  <td>{{ issue.author.username }}</td>
                   <td>{{ issue.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                 </tr>
                 {% else %}
-                <tr><td colspan="5" class="text-center">No issues found</td></tr>
+                <tr><td colspan="7" class="text-center">No issues found</td></tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -131,6 +135,7 @@
                   <th>ID</th>
                   <th>Part</th>
                   <th>Quantity</th>
+                  <th>Machine</th>
                   <th>User</th>
                   <th>Date</th>
                 </tr>
@@ -140,9 +145,10 @@
                 <tr>
                   <td>{{ tr.id }}</td>
                   <td>{{ tr.part.name }}</td>
-                  <td>{{ tr.quantity }}</td>
+                  <td>{{ tr.quantity_used }}</td>
+                  <td>{{ tr.machine.name }}</td>
                   <td>{{ tr.user.username }}</td>
-                  <td>{{ tr.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>{{ tr.date_used.strftime('%Y-%m-%d %H:%M') }}</td>
                 </tr>
                 {% else %}
                 <tr><td colspan="5" class="text-center">No transactions found</td></tr>

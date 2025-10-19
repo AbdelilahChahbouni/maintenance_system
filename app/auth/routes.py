@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request
 from app import db, bcrypt 
-from app.auth.forms import RegistrationForm, LoginForm , ResetPasswordForm , RequestResetForm , UpdateAccountForm
+from app.auth.forms import RegistrationForm, LoginForm , ResetPasswordForm , RequestResetForm , UpdateAccountForm , ChangePasswordForm
 from app.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
@@ -139,7 +139,17 @@ def reset_token(token):
 
 
 
-
+@auth.route("/change_password", methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        hashed_pw = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+        current_user.password_hash = hashed_pw
+        db.session.commit()
+        flash('Your password has been updated successfully!', 'success')
+        return redirect(url_for('auth.account'))
+    return render_template('auth/change_password.html', title='Change Password', form=form)
 
 
 

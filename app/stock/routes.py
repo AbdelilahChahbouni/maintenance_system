@@ -7,10 +7,37 @@ from flask_login import current_user , login_required
 stock = Blueprint("stock", __name__)
 
 # List Spare Parts
-@stock.route("/stocks")
+# @stock.route("/stocks")
+# def list_stock():
+#     parts = SparePart.query.all()
+#     return render_template("stock/stock_list.html", parts=parts)
+@stock.route("/stocks", methods=["GET"])
 def list_stock():
-    parts = SparePart.query.all()
-    return render_template("stock/stock_list.html", parts=parts)
+    q = request.args.get("q", "")
+
+    stocks = SparePart.query
+
+    if q:
+        stocks = stocks.filter(
+            (SparePart.name.ilike(f"%{q}%")) |
+            (SparePart.part_number.ilike(f"%{q}%"))
+        )
+
+    stocks = stocks.order_by(SparePart.id.desc()).all()
+
+    return render_template(
+        "stock/stock_list.html",
+        stocks=stocks,
+        search_query=q
+    )
+
+
+
+
+
+
+
+
 
 # Add Spare Part
 @stock.route("/stocks/new", methods=["GET", "POST"])
@@ -71,7 +98,7 @@ def stock_out():
             part.quantity -= form.quantity_used.data
             transaction = Transaction(
                 part_id=part.id,
-                machine_name=form.machine_name.data,
+                machine_id=form.machine_name.data,
                 quantity_used=form.quantity_used.data,
                 user_id=current_user.id
             )
@@ -95,6 +122,8 @@ def stock_out_list():
 def edit_stock_out(transaction_id):
     transaction = Transaction.query.get_or_404(transaction_id)
     form = TransactionForm(obj=transaction)
+    form.machine_name.choices = [(m.id, m.name) for m in Machine.query.all()]
+
 
     if form.validate_on_submit():
         old_part = transaction.part
@@ -109,6 +138,7 @@ def edit_stock_out(transaction_id):
             new_part = SparePart.query.get_or_404(form.part_id.data)
             if form.quantity_used.data > new_part.quantity:
                 flash("Not enough stock in the new part!", "danger")
+                print("Not enough stock in the new part!", "danger")
                 return redirect(url_for("stock.edit_stock_out", transaction_id=transaction.id))
             new_part.quantity -= form.quantity_used.data
 
@@ -121,16 +151,18 @@ def edit_stock_out(transaction_id):
             if diff > 0:  # need more stock
                 if diff > old_part.quantity:
                     flash("Not enough stock to increase quantity!", "danger")
+                    print("Not enough stock to increase quantity!", "danger")
                     return redirect(url_for("stock.edit_stock_out", transaction_id=transaction.id))
                 old_part.quantity -= diff
             else:  # returning stock
                 old_part.quantity += abs(diff)
 
             transaction.quantity_used = form.quantity_used.data
-            transaction.machine_name = form.machine_name.data
-
+            transaction.machine_id = form.machine_name.data
         db.session.commit()
         flash("Transaction updated successfully!", "success")
+        print("Transaction updated successfully!", "success")
+        
         return redirect(url_for("stock.stock_out_list"))
 
     return render_template("stock/edit_stock_out.html", form=form, title="Edit Transaction")

@@ -1,6 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Spare Parts</h2>
+<!-- form for search -->
+  <form method="GET" action="{{ url_for('stock.list_stock') }}" class="d-flex gap-2 mb-3">
+  <input 
+    type="text" 
+    name="q" 
+    class="form-control" 
+    placeholder="Search by name or PartName" 
+    value="{{ search_query }}"
+    style="max-width: 300px; margin-right:20px;"
+  >
+  <button type="submit" class="btn btn-primary mr-3">Search</button>
+  <a href="{{ url_for('stock.list_stock') }}" class="btn btn-secondary">Reset</a>
+</form>
+
+
+
+
+<!-- end the form -->
 <a href="{{ url_for('stock.add_stock') }}" class="btn btn-primary mb-3">+ Add Spare Part</a>
 <table class="table">
   <thead>
@@ -15,7 +33,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for part in parts %}
+    {% for part in stocks %}
     <tr>
       <td>{{ part.id }}</td>
       <td>{{ part.name }}</td>

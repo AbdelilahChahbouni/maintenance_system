@@ -1,16 +1,60 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_required
 from app import db
-from app.models import ConsumableUsage , Machine
+from app.models import ConsumableUsage , Machine , User
 from app.consumables.forms import ConsumableUsageForm
 
 consumables = Blueprint("consumables", __name__)
 
+# @consumables.route("/consumables", methods=["GET"])
+# @login_required
+# def list_consumables():
+#     all_usages = ConsumableUsage.query.order_by(ConsumableUsage.date_used.desc()).all()
+#     return render_template("consumables/consum_list.html", consumables=all_usages)
+
+
+
 @consumables.route("/consumables", methods=["GET"])
-@login_required
 def list_consumables():
-    all_usages = ConsumableUsage.query.order_by(ConsumableUsage.date_used.desc()).all()
-    return render_template("consumables/consum_list.html", consumables=all_usages)
+    q = request.args.get("q", "")
+    date_query = request.args.get("date", "")
+
+    # consumables = ConsumableUsage.query
+    consumables = ConsumableUsage.query.join(ConsumableUsage.machine).join(ConsumableUsage.user)
+
+    # Apply text filters
+    if q:
+        consumables = consumables.filter(
+            (ConsumableUsage.consumable_name.ilike(f"%{q}%")) |
+            (Machine.name.ilike(f"%{q}%")) |
+            (User.username.ilike(f"%{q}%"))
+        )
+
+    # Apply date filter
+    if date_query:
+        consumables = consumables.filter(
+            db.func.date(ConsumableUsage.date) == date_query
+        )
+
+    consumables = consumables.order_by(ConsumableUsage.id.desc()).all()
+
+    return render_template(
+        "consumables/consum_list.html",
+        consumables=consumables,
+        search_query=q,
+        date_query=date_query
+    )
+
+
+
+
+
+
+
+
+
+
+
 
 @consumables.route("/consumables/new", methods=["GET", "POST"])
 @login_required

@@ -1,15 +1,50 @@
-from flask import render_template, redirect, url_for, flash, request , Blueprint
+from flask import render_template, redirect, url_for, flash, request , Blueprint 
 from app import db
-from app.models import Issue , Machine
+from app.models import Issue , Machine , User
 from .forms import IssueForm
+from flask_login import current_user
+from sqlalchemy import or_
 
 
 issues = Blueprint('issues', __name__, template_folder='templates/auth')
 
+# @issues.route("/issues")
+# def issues_list():
+#     all_issues = Issue.query.all()
+#     return render_template("issues/issues.html", issues=all_issues)
+
+
 @issues.route("/issues")
 def issues_list():
-    all_issues = Issue.query.all()
-    return render_template("issues/issues.html", issues=all_issues)
+    search_query = request.args.get('q', '').strip()
+    date_filter = request.args.get('date', '').strip()
+
+    query = Issue.query.join(Issue.machine).join(User) # join Machine table
+
+    if search_query:
+        query = query.filter(
+            or_(
+                Issue.title.ilike(f"%{search_query}%"),
+                Machine.name.ilike(f"%{search_query}%"),
+                User.username.ilike(f"%{search_query}%")
+            )
+        )
+
+    if date_filter:
+        query = query.filter(Issue.created_at.like(f"%{date_filter}%"))
+
+    issues = query.all()
+    return render_template("issues/issues.html", issues=issues)
+
+
+
+
+
+
+
+
+
+
 
 @issues.route("/issues/<int:issue_id>")
 def issue_detail(issue_id):
@@ -28,7 +63,8 @@ def new_issue():
             title=form.title.data,
             description=form.description.data,
             solution=form.solution.data,
-            machine_name = form.machine_name.data
+            machine_id = form.machine_name.data,
+            author = current_user
         )
         db.session.add(issue)
         db.session.commit()

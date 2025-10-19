@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField 
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError 
 from app.models import User
+from flask_login import current_user
+from app import bcrypt
 from flask_wtf.file import FileField, FileAllowed
 
 
@@ -44,3 +46,16 @@ class UpdateAccountForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update')
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField('Current Password', validators=[DataRequired()])
+    new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm New Password', validators=[
+        DataRequired(),
+        EqualTo('new_password', message='Passwords must match.')
+    ])
+    submit = SubmitField('Change Password')
+
+    def validate_current_password(self, current_password):
+        if not bcrypt.check_password_hash(current_user.password_hash, current_password.data):
+            raise ValidationError('Current password is incorrect.')

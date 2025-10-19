@@ -1,6 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>All Issues</h2>
+<!-- search section  -->
+<form method="GET" action="{{ url_for('issues.issues_list') }}" class="d-flex gap-2 mb-3">
+  <input 
+    type="text" 
+    name="q" 
+    class="form-control mr-2" 
+    placeholder="Search by title or machine or User" 
+    value="{{ search_query }}"
+    style="width: 300px;"
+  >
+  <input 
+    type="date" 
+    name="date" 
+    class="form-control mr-2" 
+    value="{{ date_query }}"
+    style="width: 300px;"
+  >
+  <button type="submit" class="btn btn-primary mr-2">Search</button>
+  <a href="{{ url_for('issues.issues_list') }}" class="btn btn-secondary">Reset</a>
+</form>
+
+
+<!-- end the section  -->
+
 <a class="btn btn-primary mb-3" href="{{ url_for('issues.new_issue') }}">+ Add Issue</a>
 
 <table class="table table-bordered">
@@ -10,6 +34,8 @@
       <th>Machine</th>
       <th>Description</th>
       <th>Solution</th>
+      <th>User</th>
+      <th>Date</th>
       <th>Actions</th>
 
     </tr>
@@ -22,14 +48,20 @@
             {{ issue.title }}
           </a>
       </td>
-      <td>{{ issue.machine_name }}</td>
+      <td>{{ issue.machine.name }}</td>
       <td>{{ issue.description }}</td>
       <td>{{ issue.solution }}</td>
+      <td>{{ issue.author.username }}</td>
+      <td>{{ issue.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
       <td>
+        {% if current_user.username == issue.author.username %}
         <a href="{{ url_for('issues.edit_issue', issue_id=issue.id) }}" class="btn btn-sm btn-warning">Edit</a>
         <form action="{{ url_for('issues.delete_issue', issue_id=issue.id) }}" method="POST" style="display:inline;">
           <button type="submit" class="btn btn-sm btn-danger">Delete</button>
         </form>
+        {% else %}
+        Not Permeted
+        {% endif %}
       </td>
     </tr>
     {% endfor %}

@@ -15,8 +15,111 @@
 
     <!-- Custom styles for this template-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     {% block extra_css %}{% endblock %}
+    <!-- Dark mode overrides: place AFTER sb-admin-2.min.css -->
+<style>
+  /* 🌙 Light Mode (default) */
+  :root {
+    --bg: #ffffff;
+    --page-bg: #f8f9fc;
+    --card-bg: #ffffff;
+    --muted: #6c757d;
+    --text: #212529;
+    --sidebar-bg: #4e73df;
+    --sidebar-text: #fff;
+  }
+
+  /* 🌙 Dark Mode Variables */
+  body.dark-mode {
+    --bg: #0b0f12;
+    --page-bg: #0f1418;
+    --card-bg: #1a1f23;
+    --muted: #a0a9b0;
+    --text: #e6eef3;
+    --sidebar-bg: #0d1117;
+    --sidebar-text: #cfd6dc;
+  }
+
+  /* Page background and text */
+  body {
+    background-color: var(--page-bg) !important;
+    color: var(--text) !important;
+    transition: background-color .3s, color .3s;
+  }
+
+  /* Navbar / Topbar */
+  .navbar, .topbar {
+    background-color: var(--card-bg) !important;
+    color: var(--text) !important;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--sidebar-bg) !important;
+    color: var(--sidebar-text) !important;
+  }
+
+  .sidebar .nav-item .nav-link,
+  .sidebar .sidebar-brand,
+  .sidebar .sidebar-heading {
+    color: var(--sidebar-text) !important;
+  }
+
+  .sidebar .nav-item.active .nav-link,
+  .sidebar .nav-item .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Cards */
+  .card {
+    background-color: var(--card-bg) !important;
+    color: var(--text) !important;
+    border: 1px solid rgba(255,255,255,0.05) !important;
+  }
+
+  /* Tables */
+  .table {
+    color: var(--text) !important;
+  }
+  .table thead th {
+    border-bottom-color: rgba(255,255,255,0.1) !important;
+  }
+
+  /* Forms */
+  .form-control {
+    background-color: var(--card-bg) !important;
+    color: var(--text) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background-color: #4e73df !important;
+    border-color: #4e73df !important;
+  }
+  body.dark-mode .btn-primary {
+    background-color: #3752a1 !important;
+    border-color: #3752a1 !important;
+  }
+
+  /* Dropdowns and Modals */
+  .dropdown-menu,
+  .modal-content {
+    background-color: var(--card-bg) !important;
+    color: var(--text) !important;
+  }
+
+  /* Text muted */
+  .text-muted, .small {
+    color: var(--muted) !important;
+  }
+</style>
+
+     
+
+
+    
 </head>
 
 <body id="page-top">
@@ -76,5 +179,28 @@
 <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
 
 {% block extra_js %}{% endblock %}
+<script>
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+
+  // Check saved mode
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeIcon.classList.replace('bi-moon', 'bi-sun');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+
+    if (document.body.classList.contains('dark-mode')) {
+      themeIcon.classList.replace('bi-moon', 'bi-sun');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      themeIcon.classList.replace('bi-sun', 'bi-moon');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+</script>
+
 </body>
 </html>

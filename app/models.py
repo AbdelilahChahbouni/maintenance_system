@@ -2,7 +2,6 @@ from datetime import datetime
 from app import db, login_manager, bcrypt 
 from flask_login import UserMixin
 from config import Config
-
 from itsdangerous import URLSafeTimedSerializer
 
 
@@ -18,6 +17,7 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(20), default='technician') # or 'admin'
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    issues = db.relationship('Issue', backref='author', lazy=True)
 
 
     def set_password(self, raw_password):
@@ -65,12 +65,16 @@ class Machine(db.Model):
 class Issue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
-    machine_name = db.Column(db.String(100))
+    # machine_name = db.Column(db.String(100))
     description = db.Column(db.Text)
     solution = db.Column(db.Text)
     # status = db.Column(db.String(20), default='open')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    machine_id = db.Column(db.Integer, db.ForeignKey('machine.id'))  # 👈 link to machine
+
+    machine = db.relationship('Machine', backref='issues', lazy=True)
 
 
 class SparePart(db.Model):
@@ -88,15 +92,17 @@ class SparePart(db.Model):
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     part_id = db.Column(db.Integer, db.ForeignKey("spare_part.id"), nullable=False)
-    machine_name = db.Column(db.String(120), nullable=False)
     quantity_used = db.Column(db.Integer, nullable=False)
     date_used = db.Column(db.DateTime, default=datetime.utcnow)
 
+    machine_id = db.Column(db.Integer, db.ForeignKey('machine.id'))  # 👈 link to machine
+    machine = db.relationship('Machine', backref='transactions', lazy=True)
+
     # Track who made the transaction
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-
-    part = db.relationship("SparePart", backref="transactions", lazy=True)
     user = db.relationship("User", backref="transactions", lazy=True)
+    part = db.relationship("SparePart", backref="transactions", lazy=True)
+    
 
 
 class ConsumableUsage(db.Model):

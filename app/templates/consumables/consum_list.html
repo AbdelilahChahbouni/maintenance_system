@@ -1,6 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Consumables Log</h2>
+<!-- serch section form  -->
+  <form method="GET" action="{{ url_for('consumables.list_consumables') }}" class="d-flex gap-2 mb-3 flex-wrap">
+  <input 
+    type="text" 
+    name="q" 
+    class="form-control" 
+    placeholder="Search by name, machine, or user" 
+    value="{{ search_query }}"
+    style="max-width: 250px;"
+  >
+  <input 
+    type="date" 
+    name="date" 
+    class="form-control" 
+    value="{{ date_query }}"
+    style="max-width: 200px;"
+  >
+  <button type="submit" class="btn btn-primary">Search</button>
+  <a href="{{ url_for('consumables.list_consumables') }}" class="btn btn-secondary">Reset</a>
+</form>
+
+
+
+
+
+
+<!-- end the section  -->
 <a class="btn btn-primary mb-3" href="{{ url_for('consumables.new_consumable') }}">+ Log Consumable</a>
 <table class="table table-bordered">
   <thead>
