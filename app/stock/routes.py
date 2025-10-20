@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request 
 from app import db
-from app.models import SparePart , Transaction , Machine 
+from app.models import SparePart , Transaction , Machine , User
 from .forms import SparePartForm , TransactionForm
 from flask_login import current_user , login_required
+from datetime import datetime
 
 stock = Blueprint("stock", __name__)
 
@@ -30,14 +31,6 @@ def list_stock():
         stocks=stocks,
         search_query=q
     )
-
-
-
-
-
-
-
-
 
 # Add Spare Part
 @stock.route("/stocks/new", methods=["GET", "POST"])
@@ -110,10 +103,56 @@ def stock_out():
     return render_template("stock/stock_out.html", form=form, title="Use Spare Part")
 
 
-@stock.route("/stock_out_list")
+# @stock.route("/stock_out_list")
+# def stock_out_list():
+#     transactions = Transaction.query.order_by(Transaction.date_used.desc()).all()
+#     return render_template("stock/stock_out_list.html", transactions=transactions, title="Transactions")
+
+@stock.route("/stock_out_list", methods=["GET"])
+# @login_required
 def stock_out_list():
-    transactions = Transaction.query.order_by(Transaction.date_used.desc()).all()
-    return render_template("stock/stock_out_list.html", transactions=transactions, title="Transactions")
+    search_query = request.args.get("q", "")
+    date_query = request.args.get("date", "")
+
+    transactions = Transaction.query
+
+    if search_query:
+        transactions = transactions.join(SparePart).join(Machine).join(User).filter(
+            db.or_(
+                SparePart.name.ilike(f"%{search_query}%"),
+                Machine.name.ilike(f"%{search_query}%"),
+                User.username.ilike(f"%{search_query}%"),
+            )
+        )
+
+    if date_query:
+        try:
+            date_obj = datetime.strptime(date_query, "%Y-%m-%d").date()
+            transactions = transactions.filter(
+                db.func.date(Transaction.date_used) == date_obj
+            )
+        except ValueError:
+            pass
+
+    transactions = transactions.order_by(Transaction.date_used.desc()).all()
+
+    return render_template(
+        "stock/stock_out_list.html",
+        transactions=transactions,
+        search_query=search_query,
+        date_query=date_query,
+        title="Stock Out List"
+    )
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -180,5 +219,5 @@ def delete_stock_out(transaction_id):
 
     db.session.delete(transaction)
     db.session.commit()
-    flash("Transaction deleted and stock restored!", "success")
+    flash("Transaction deleted and stock restored!", "danger")
     return redirect(url_for("stock.stock_out_list"))

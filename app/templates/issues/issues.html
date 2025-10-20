@@ -57,7 +57,7 @@
         {% if current_user.username == issue.author.username %}
         <a href="{{ url_for('issues.edit_issue', issue_id=issue.id) }}" class="btn btn-sm btn-warning">Edit</a>
         <form action="{{ url_for('issues.delete_issue', issue_id=issue.id) }}" method="POST" style="display:inline;">
-          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this issue?')">Delete</button>
         </form>
         {% else %}
         Not Permeted

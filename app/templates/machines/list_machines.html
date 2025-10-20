@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Machines</h2>
+<form method="GET" action="{{ url_for('machines.list_machines') }}" class="d-flex gap-2 mb-3">
+  <input 
+    type="text" 
+    name="q" 
+    class="form-control" 
+    placeholder="Search by name or location"
+    value="{{ search_query }}"
+    style="width: 300px; margin-right: 15px;"
+  >
+  <button type="submit" class="btn btn-primary mr-3">Search</button>
+  <a href="{{ url_for('machines.list_machines') }}" class="btn btn-secondary">Reset</a>
+</form>
+
 <a href="{{ url_for('machines.new_machine') }}" class="btn btn-primary mb-3">+ Add Machine</a>
 <table class="table table-striped">
   <thead>

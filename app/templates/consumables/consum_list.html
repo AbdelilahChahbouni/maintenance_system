@@ -23,10 +23,6 @@
 </form>
 
 
-
-
-
-
 <!-- end the section  -->
 <a class="btn btn-primary mb-3" href="{{ url_for('consumables.new_consumable') }}">+ Log Consumable</a>
 <table class="table table-bordered">
@@ -52,7 +48,7 @@
         <td>
           <a href="{{ url_for('consumables.edit_consumable', usage_id=c.id) }}" class="btn btn-sm btn-warning">Edit</a>
           <form method="POST" action="{{ url_for('consumables.delete_consumable', usage_id=c.id) }}" style="display:inline;">
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this Consumable item?')">Delete</button>
           </form>
         
       </td>

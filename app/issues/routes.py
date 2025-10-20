@@ -36,22 +36,6 @@ def issues_list():
     issues = query.all()
     return render_template("issues/issues.html", issues=issues)
 
-
-
-
-
-
-
-
-
-
-
-@issues.route("/issues/<int:issue_id>")
-def issue_detail(issue_id):
-    issue = Issue.query.get_or_404(issue_id)  # returns 404 if not found
-    return render_template("issues/issue_details.html", issue=issue)
-
-
 @issues.route("/issues/new", methods=["GET", "POST"])
 def new_issue():
    
@@ -72,10 +56,18 @@ def new_issue():
         return redirect(url_for("issues.issues_list"))
     return render_template("issues/add_issue.html", form=form, title="New Issue")
 
+@issues.route("/issues/<int:issue_id>")
+def issue_detail(issue_id):
+    issue = Issue.query.get_or_404(issue_id)  # returns 404 if not found
+    return render_template("issues/issue_details.html", issue=issue)
+
+
+
 @issues.route("/issues/<int:issue_id>/edit", methods=["GET", "POST"])
 def edit_issue(issue_id):
     issue = Issue.query.get_or_404(issue_id)
     form = IssueForm(obj=issue)
+    form.machine_name.choices = [(m.id, m.name) for m in Machine.query.all()]
     if form.validate_on_submit():
         issue.title = form.title.data
         issue.description = form.description.data

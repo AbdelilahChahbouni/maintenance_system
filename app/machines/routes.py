@@ -5,10 +5,43 @@ from app.machines.forms import MachineForm
 
 machines = Blueprint("machines", __name__)
 
-@machines.route("/machines")
+# @machines.route("/machines")
+# def list_machines():
+#     all_machines = Machine.query.all()
+#     return render_template("machines/list_machines.html", machines=all_machines)
+
+@machines.route("/machines", methods=["GET"])
+# @login_required
 def list_machines():
-    all_machines = Machine.query.all()
-    return render_template("machines/list_machines.html", machines=all_machines)
+    search_query = request.args.get("q", "")
+
+    machines = Machine.query
+
+    if search_query:
+        machines = machines.filter(
+            db.or_(
+                Machine.name.ilike(f"%{search_query}%"),
+                Machine.location.ilike(f"%{search_query}%")
+            )
+        )
+
+    machines = machines.order_by(Machine.name.asc()).all()
+
+    return render_template(
+        "machines/list_machines.html",
+        machines=machines,
+        search_query=search_query,
+        title="Machines List"
+    )
+
+
+
+
+
+
+
+
+
 
 @machines.route("/machines/new", methods=["GET", "POST"])
 def new_machine():
@@ -41,5 +74,5 @@ def delete_machine(id):
     machine = Machine.query.get_or_404(id)
     db.session.delete(machine)
     db.session.commit()
-    flash("Machine deleted successfully!", "info")
+    flash("Machine deleted successfully!", "danger")
     return redirect(url_for("machines.list_machines"))

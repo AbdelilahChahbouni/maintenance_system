@@ -110,5 +110,5 @@ def delete_consumable(usage_id):
     usage = ConsumableUsage.query.get_or_404(usage_id)
     db.session.delete(usage)
     db.session.commit()
-    flash("Consumable usage deleted successfully 🗑️", "success")
+    flash("Consumable usage deleted successfully 🗑️", "danger")
     return redirect(url_for("consumables.list_consumables"))
