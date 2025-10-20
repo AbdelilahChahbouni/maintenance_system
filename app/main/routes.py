@@ -4,6 +4,7 @@ from app.models import Issue, Transaction, ConsumableUsage, Machine
 
 main = Blueprint("main", __name__)
 
+
 @main.route('/dashboard')
 def dashboard():
     total_issues = Issue.query.count()
