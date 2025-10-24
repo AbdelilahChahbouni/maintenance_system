@@ -120,6 +120,33 @@
                 </div>
             </li>
 
+            <!-- User Managments -->
+             <li class="nav-item">
+                <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapsePages2" aria-expanded="true"
+                    aria-controls="collapsePages2">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>User managment</span>
+                </a>
+                <div id="collapsePages2" class="collapse " aria-labelledby="headingPages"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <!-- <h6 class="collapse-header">Login Screens:</h6> -->
+                        <a class="collapse-item" href="{{ url_for('auth.list_users') }}">List Users</a>
+                        <a class="collapse-item" href="{{ url_for('auth.update_user_status') }}"> Block or Active User</a>
+                        <a class="collapse-item" href="{{ url_for('auth.delete_user') }}"> Delete User</a>
+                        <div class="collapse-divider"></div>
+                        <!-- <h6 class="collapse-header">Other Pages:</h6>
+                        <a class="collapse-item" href="404.html">404 Page</a>
+                        <a class="collapse-item active" href="blank.html">Blank Page</a> -->
+                    </div>
+                </div>
+            </li>
+
+
+
+
+
+
             <!-- Nav Item - Charts -->
             <!-- <li class="nav-item">
                 <a class="nav-link" href="charts.html">

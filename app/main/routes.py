@@ -26,3 +26,8 @@ def dashboard():
         recent_transactions=recent_transactions,
         recent_consumables=recent_consumables
     )
+
+
+@main.route('/access-denied')
+def access_denied():
+    return render_template('errors/access_denied.html', title='Access Denied')

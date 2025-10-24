@@ -1,5 +1,5 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField 
+from flask_wtf import FlaskForm 
+from wtforms import StringField, PasswordField, SubmitField , SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError 
 from app.models import User
 from flask_login import current_user
@@ -59,3 +59,16 @@ class ChangePasswordForm(FlaskForm):
     def validate_current_password(self, current_password):
         if not bcrypt.check_password_hash(current_user.password_hash, current_password.data):
             raise ValidationError('Current password is incorrect.')
+        
+
+
+
+class UpdateUserStatusForm(FlaskForm):
+    user = SelectField('Select User', coerce=int)
+    status = SelectField('Select Status', choices=[('active', 'Active'), ('blocked', 'Blocked')])
+    submit = SubmitField('Update Status')
+
+
+class DeleteUserForm(FlaskForm):
+    user = SelectField('Select User to Delete', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Delete User')

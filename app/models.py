@@ -18,6 +18,8 @@ class User(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     issues = db.relationship('Issue', backref='author', lazy=True)
+    status = db.Column(db.String(20), default='blocked')
+    is_admin = db.Column(db.Boolean, default=False) 
 
 
     def set_password(self, raw_password):

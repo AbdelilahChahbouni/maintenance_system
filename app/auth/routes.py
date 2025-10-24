@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request
 from app import db, bcrypt 
-from app.auth.forms import RegistrationForm, LoginForm , ResetPasswordForm , RequestResetForm , UpdateAccountForm , ChangePasswordForm
+from app.auth.forms import RegistrationForm, LoginForm , ResetPasswordForm , DeleteUserForm ,RequestResetForm , UpdateAccountForm , ChangePasswordForm ,UpdateUserStatusForm
 from app.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
@@ -42,7 +42,10 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):  # uses User.check_password method
+        if user and user.check_password(form.password.data):
+            if user.status != 'active':
+                flash("Your account is blocked. Contact admin.", "danger")
+                return redirect(url_for('auth.blocked_user')) # uses User.check_password method
             login_user(user)
             flash("Login successful!", "success")
 
@@ -54,6 +57,10 @@ def login():
 
     return render_template("auth/login.html", form=form)
 
+
+@auth.route('/blocked_user' , methods=['GET'])
+def blocked_user():
+    return render_template('auth/blocked_user.html')
 
 @auth.route('/account' , methods=['GET' , 'POST'])
 def account():
@@ -88,6 +95,49 @@ def logout():
     logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for("auth.login"))
+
+@auth.route('/users')
+@login_required
+def list_users():
+    users = User.query.order_by(User.created_at.desc()).all()
+    return render_template('auth/list_users.html', users=users, title="User Management")
+
+
+@auth.route('/admin/update_user_status', methods=['GET', 'POST'])
+@login_required
+def update_user_status():
+    form = UpdateUserStatusForm()
+    # Populate user select field with all users
+    form.user.choices = [(u.id, u.username) for u in User.query.all()]
+
+    if form.validate_on_submit():
+        user = User.query.get(form.user.data)
+        user.status = form.status.data
+        db.session.commit()
+        flash(f"{user.username} status updated to {user.status}", "success")
+        return redirect(url_for('auth.update_user_status'))
+
+    return render_template('auth/update_user_status.html', form=form, title='Update User Status')
+
+@auth.route('/delete_user', methods=['GET', 'POST'])
+@login_required
+def delete_user():
+    form = DeleteUserForm()
+    form.user.choices = [(u.id, f"{u.username} - {u.email}") for u in User.query.all()]
+
+    if form.validate_on_submit():
+        user_id = form.user.data
+        user = User.query.get(user_id)
+
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            flash(f"User '{user.username}' has been deleted successfully.", "success")
+            return redirect(url_for('auth.list_users'))
+        else:
+            flash("User not found.", "danger")
+
+    return render_template('auth/delete_user.html', form=form)
 
 
 
