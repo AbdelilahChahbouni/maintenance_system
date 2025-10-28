@@ -58,7 +58,7 @@ def create_app(config_class=Config):
 
     # Import models here to avoid circular import
     from app.models import User, Machine, Issue, SparePart, Transaction
-    from app.admin_views import AdminModelView
+    
    
    
     # Flask-Admin
@@ -75,8 +75,8 @@ def create_app(config_class=Config):
     # admin.add_view(AdminModelView(Issue, db.session))
     # admin.add_view(AdminModelView(SparePart, db.session))
     # admin.add_view(AdminModelView(Transaction, db.session))
-    from app.admin_setup import create_admin
-    create_admin(app)
+    
+    
     
 
     return app
