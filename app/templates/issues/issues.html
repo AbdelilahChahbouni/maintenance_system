@@ -1,33 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>All Issues</h2>
-<!-- search section  -->
-<form method="GET" action="{{ url_for('issues.issues_list') }}" class="d-flex gap-2 mb-3">
-  <input 
-    type="text" 
-    name="q" 
-    class="form-control mr-2" 
-    placeholder="Search by title or machine or User" 
-    value="{{ search_query }}"
-    style="width: 300px;"
-  >
-  <input 
-    type="date" 
-    name="date" 
-    class="form-control mr-2" 
-    value="{{ date_query }}"
-    style="width: 300px;"
-  >
-  <button type="submit" class="btn btn-primary mr-2">Search</button>
-  <a href="{{ url_for('issues.issues_list') }}" class="btn btn-secondary">Reset</a>
+<!-- search section -->
+<form method="GET" action="{{ url_for('issues.issues_list') }}" 
+      class="d-flex flex-wrap gap-2 mb-3">
+
+  <div class="flex-grow-1 mb-2" style="min-width: 200px;">
+    <input 
+      type="text" 
+      name="q" 
+      class="form-control" 
+      placeholder="Search by title or machine or User" 
+      value="{{ search_query }}"
+    >
+  </div>
+
+  <div class="flex-grow-1 mb-2 mr-2" style="min-width: 200px;">
+    <input 
+      type="date" 
+      name="date" 
+      class="form-control" 
+      value="{{ date_query }}"
+    >
+  </div>
+  <div>
+      <button type="submit" class="btn btn-primary">Search</button>
+      <a href="{{ url_for('issues.issues_list') }}" class="btn btn-secondary">Reset</a>
+      <a href="{{ url_for('issues.export_issues_pdf') }}" class="btn btn-danger">
+         <i class="fas fa-file-pdf"></i> Export to PDF
+      </a>
+  </div>
+  
 </form>
+
 
 
 <!-- end the section  -->
 
 <a class="btn btn-primary mb-3" href="{{ url_for('issues.new_issue') }}">+ Add Issue</a>
+<div class="table-responsive">
 
-<table class="table table-bordered">
+  <table class="table table-bordered">
   <thead>
     <tr>
       <th>Title</th>
@@ -67,4 +80,6 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
+
 {% endblock %}

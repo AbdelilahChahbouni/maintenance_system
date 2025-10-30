@@ -20,8 +20,8 @@
   <button type="submit" class="btn btn-primary mr-3">Search</button>
   <a href="{{ url_for('stock.stock_out_list') }}" class="btn btn-secondary">Reset</a>
 </form>
-
-<table class="table table-striped">
+<div class="table-responsive">
+  <table class="table table-striped">
   <thead>
     <tr>
       <th>Date</th>
@@ -52,5 +52,7 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
+
 {% endblock %}
 

@@ -20,7 +20,8 @@
 
 <!-- end the form -->
 <a href="{{ url_for('stock.add_stock') }}" class="btn btn-primary mb-3">+ Add Spare Part</a>
-<table class="table">
+<div class="table-responsive">
+  <table class="table">
   <thead>
     <tr>
       <th>ID</th>
@@ -50,4 +51,6 @@
     {% endfor %}
   </tbody>
 </table>
+</div>
+
 {% endblock %}
