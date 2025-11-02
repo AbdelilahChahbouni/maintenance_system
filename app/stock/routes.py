@@ -1,17 +1,25 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request 
+from flask import Blueprint, render_template, redirect, url_for, flash, request , jsonify
 from app import db
 from app.models import SparePart , Transaction , Machine , User
 from .forms import SparePartForm , TransactionForm
 from flask_login import current_user , login_required
 from datetime import datetime
+from app.utils import export_to_pdf , generate_qr_for_part
 
 stock = Blueprint("stock", __name__)
 
-# List Spare Parts
-# @stock.route("/stocks")
-# def list_stock():
-#     parts = SparePart.query.all()
-#     return render_template("stock/stock_list.html", parts=parts)
+@stock.route('/stock/export/pdf')
+def export_stock_pdf():
+    items = SparePart.query.all()
+    headers = ["#", "Item Name", "Part Number", "Quantity", "Location"]
+    rows = [
+        [i + 1, item.name, item.part_number , item.quantity, item.location]
+        for i, item in enumerate(items)
+    ]
+    return export_to_pdf("📦 Stock Inventory Report", headers, rows, "stock_report.pdf")
+
+
+
 @stock.route("/stocks", methods=["GET"])
 def list_stock():
     q = request.args.get("q", "")
@@ -45,6 +53,10 @@ def add_stock():
             description=form.description.data
         )
         db.session.add(part)
+        db.session.commit()
+
+        qr_relpath = generate_qr_for_part(part)
+        part.qr_filename = qr_relpath
         db.session.commit()
         flash("New spare part added!", "success")
         return redirect(url_for("stock.list_stock"))
@@ -103,10 +115,15 @@ def stock_out():
     return render_template("stock/stock_out.html", form=form, title="Use Spare Part")
 
 
-# @stock.route("/stock_out_list")
-# def stock_out_list():
-#     transactions = Transaction.query.order_by(Transaction.date_used.desc()).all()
-#     return render_template("stock/stock_out_list.html", transactions=transactions, title="Transactions")
+@stock.route('/transaction/export/pdf')
+def export_stock_transaction_pdf():
+    items = Transaction.query.all()
+    headers = ["#", "Date", "Part", "Quantity", "Machine","User"]
+    rows = [
+        [i + 1, item.date_used.strftime("%Y-%m-%d %H:%M") , item.part.name , item.quantity_used, item.machine.name,item.user.username]
+        for i, item in enumerate(items)
+    ]
+    return export_to_pdf("📦 Transactions Inventory Report", headers, rows, "stock_report.pdf")
 
 @stock.route("/stock_out_list", methods=["GET"])
 # @login_required
@@ -143,18 +160,6 @@ def stock_out_list():
         date_query=date_query,
         title="Stock Out List"
     )
-
-
-
-
-
-
-
-
-
-
-
-
 
 @stock.route("/stock_out/<int:transaction_id>/edit", methods=["GET", "POST"])
 @login_required
@@ -221,3 +226,78 @@ def delete_stock_out(transaction_id):
     db.session.commit()
     flash("Transaction deleted and stock restored!", "danger")
     return redirect(url_for("stock.stock_out_list"))
+
+
+
+# transaction OUT using QR Scanner
+
+@stock.route('/scan-transaction')
+@login_required
+def scan_transaction():
+    return render_template('stock/scan_transaction.html')
+
+
+@stock.route("/process-scan", methods=["POST"])
+@login_required
+def process_scan():
+    data = request.get_json()
+    qr_data = data.get("qr_data") if data else None
+
+    if not qr_data:
+        return jsonify({"success": False, "message": "No QR data received."}), 400
+
+    # Handle QR format like "PART:3"
+    if qr_data.startswith("PART:"):
+        try:
+            part_id = int(qr_data.split(":")[1])
+            part = SparePart.query.get(part_id)
+            if not part:
+                return jsonify({"success": False, "message": "Part not found."}), 404
+
+            # Redirect user to confirmation form (quantity + machine)
+            redirect_url = url_for("stock.confirm_transaction", part_id=part.id)
+            return jsonify({"success": True, "message": f"Part '{part.name}' scanned successfully.", "redirect_url": redirect_url})
+        except Exception as e:
+            print("Error:", e)
+            return jsonify({"success": False, "message": "Invalid QR format."}), 400
+    else:
+        return jsonify({"success": False, "message": "Invalid QR format. Expected 'PART:<id>'."}), 400
+
+
+
+@stock.route("/confirm-transaction/<int:part_id>", methods=["GET", "POST"])
+@login_required
+def confirm_transaction(part_id):
+    part = SparePart.query.get_or_404(part_id)
+    machines = Machine.query.all()  # Load all machines
+
+    if request.method == "POST":
+        machine = request.form.get("machine_id")
+        quantity = int(request.form.get("quantity", 0))
+
+        if not machine or quantity <= 0:
+            flash("Please enter valid machine and quantity.", "danger")
+            return redirect(url_for("stock.confirm_transaction", part_id=part.id))
+
+        if part.quantity < quantity:
+            flash("Not enough stock available.", "danger")
+            return redirect(url_for("stock.confirm_transaction", part_id=part.id))
+
+        # Create a transaction
+        transaction = Transaction(
+            part_id=part.id,
+            user_id=current_user.id,
+            machine_id=machine,
+            quantity_used=quantity,
+        )
+        db.session.add(transaction)
+
+        # Update stock
+        part.quantity -= quantity
+        db.session.commit()
+
+        flash(f"Transaction completed successfully for part {part.name}.", "success")
+        return redirect(url_for("stock.stock_out_list"))
+
+    return render_template("stock/confirm_transaction_qr.html", part=part , machines=machines)
+

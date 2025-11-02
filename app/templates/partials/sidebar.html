@@ -54,10 +54,11 @@
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <!-- <h6 class="collapse-header">Custom Utilities:</h6> -->
-                        <a class="collapse-item" href={{url_for('stock.list_stock')}}>List Stocks</a>
-                        <a class="collapse-item" href={{url_for('stock.add_stock')}}>Add Item to stock</a>
+                        <a class="collapse-item" href={{url_for('stock.list_stock')}}>List Items Stocks</a>
+                        <a class="collapse-item" href={{url_for('stock.add_stock')}}>Input</a>
                         <a class="collapse-item" href={{url_for('stock.stock_out_list')}}>Lits Stocks out</a>
-                        <a class="collapse-item" href={{url_for('stock.stock_out')}}>Add Item out from stock</a>
+                        <a class="collapse-item" href={{url_for('stock.stock_out')}}>Output</a>
+                        <a class="collapse-item" href={{url_for('stock.scan_transaction')}}>Output Using SCAN QR</a>
                     </div>
                 </div>
             </li>

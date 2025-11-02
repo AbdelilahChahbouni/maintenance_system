@@ -86,6 +86,7 @@ class SparePart(db.Model):
     quantity = db.Column(db.Integer, default=0)
     location = db.Column(db.String(100))   # e.g. Warehouse A - Shelf B
     description = db.Column(db.Text)
+    qr_filename = db.Column(db.String(150), nullable=True)
 
     def __repr__(self):
         return f"<SparePart {self.name}>"

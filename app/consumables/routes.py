@@ -3,15 +3,22 @@ from flask_login import current_user, login_required
 from app import db
 from app.models import ConsumableUsage , Machine , User
 from app.consumables.forms import ConsumableUsageForm
+from app.utils import export_to_pdf
 
 consumables = Blueprint("consumables", __name__)
 
-# @consumables.route("/consumables", methods=["GET"])
-# @login_required
-# def list_consumables():
-#     all_usages = ConsumableUsage.query.order_by(ConsumableUsage.date_used.desc()).all()
-#     return render_template("consumables/consum_list.html", consumables=all_usages)
 
+
+
+@consumables.route('/consumables/export/pdf')
+def export_consumables_pdf():
+    items = ConsumableUsage.query.all()
+    headers = ["#", "Date", "Name", "Quantity", "Machine" , "User"]
+    rows = [
+        [i + 1, c.date_used.strftime('%Y-%m-%d %H:%M'), c.consumable_name, c.quantity, c.machine.name , c.user.username]
+        for i, c in enumerate(items)
+    ]
+    return export_to_pdf("🧰 Consumables Report", headers, rows, "consumables_report.pdf")
 
 
 @consumables.route("/consumables", methods=["GET"])

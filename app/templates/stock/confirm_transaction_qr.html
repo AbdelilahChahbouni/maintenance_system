@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow p-4">
+    <h4 class="mb-3">Confirm Transaction</h4>
+
+    <form method="POST" action="{{ url_for('stock.confirm_transaction', part_id=part.id) }}">
+      <div class="mb-3">
+        <label class="form-label">Part Name</label>
+        <input type="text" class="form-control" value="{{ part.name }}" readonly>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Part Number</label>
+        <input type="text" class="form-control" value="{{ part.part_number }}" readonly>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Quantity</label>
+        <input type="number" class="form-control" name="quantity" value="1" min="1" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Machine</label>
+        <select class="form-select" name="machine_id" required>
+          <option value="">Select machine</option>
+          {% for machine in machines %}
+          <option value="{{ machine.id }}">{{ machine.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-success">Confirm Transaction</button>
+      <a href="{{ url_for('stock.scan_transaction') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
