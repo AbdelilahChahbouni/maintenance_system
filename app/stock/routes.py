@@ -301,3 +301,64 @@ def confirm_transaction(part_id):
 
     return render_template("stock/confirm_transaction_qr.html", part=part , machines=machines)
 
+
+# transaction IN using QR
+
+@stock.route("/scan-transaction-in")
+@login_required
+def scan_transaction_in():
+    """Page to scan QR code for stock IN transactions."""
+    return render_template("stock/scan_transaction_in.html")
+
+
+@stock.route("/process-scan-in", methods=["POST"])
+@login_required
+def process_scan_in():
+    data = request.get_json()
+    qr_data = data.get("part_id")
+
+    if not qr_data:
+        return jsonify({"success": False, "message": "Invalid QR code data"}), 400
+
+    if qr_data.startswith("PART:"):
+        part_id = qr_data.split(":")[1]
+        part = SparePart.query.get(part_id)
+        if part:
+            return jsonify({
+                "success": True,
+                "message": f"Part found: {part.name}",
+                "redirect": url_for("stock.confirm_transaction_in", part_id=part.id)
+            })
+        else:
+            return jsonify({"success": False, "message": "Part not found"}), 404
+    else:
+        return jsonify({"success": False, "message": "Invalid QR format"}), 400
+
+
+@stock.route("/confirm-transaction-in/<int:part_id>", methods=["GET", "POST"])
+@login_required
+def confirm_transaction_in(part_id):
+    part = SparePart.query.get_or_404(part_id)
+
+    if request.method == "POST":
+        quantity = int(request.form.get("quantity", 0))
+
+        if quantity <= 0:
+            flash("Please enter a valid quantity.", "danger")
+            return redirect(url_for("stock.confirm_transaction_in", part_id=part.id))
+
+        transaction = Transaction(
+            part_id=part.id,
+            user_id=current_user.id,
+            quantity_used=quantity,
+        )
+
+        # ✅ Increase stock
+        part.quantity += quantity
+        db.session.add(transaction)
+        db.session.commit()
+
+        flash(f"Successfully added {quantity} units to {part.name}.", "success")
+        return redirect(url_for("stock.list_stock"))
+
+    return render_template("stock/confirm_transaction_in.html", part=part)

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan QR - Stock IN</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      text-align: center;
+      padding: 20px;
+    }
+    #reader {
+      width: 350px;
+      margin: auto;
+    }
+    .msg {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Scan Spare Part QR Code - Stock IN</h2>
+  <div id="reader"></div>
+  <div class="msg" id="msg"></div>
+
+  <script>
+    function onScanSuccess(decodedText) {
+      fetch("/process-scan-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ part_id: decodedText })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("msg").innerText = data.message;
+        if (data.success) {
+          document.getElementById("msg").style.color = "green";
+          if (data.redirect) {
+            window.location.href = data.redirect;
+          }
+        } else {
+          document.getElementById("msg").style.color = "red";
+        }
+      })
+      .catch(err => console.error(err));
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+        html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 250 },
+          onScanSuccess
+        );
+      }
+    });
+  </script>
+</body>
+</html>
