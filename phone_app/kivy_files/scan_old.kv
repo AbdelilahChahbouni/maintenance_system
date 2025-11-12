@@ -1,0 +1,31 @@
+<ScanScreen>:
+    name: "scan"
+    BoxLayout:
+        orientation: "vertical"
+        padding: 20
+        spacing: 15
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: "Scan Part QR"
+            size_hint_y: 0.1
+            font_size: 28
+            color: 0.1,0.1,0.1,1
+
+        Image:
+            id: camera_feed
+            allow_stretch: True
+            keep_ratio: True
+
+        Button:
+            text: "Cancel"
+            size_hint_y: 0.15
+            font_size: 22
+            background_color: 0.8, 0.2, 0.2, 1
+            color: 1,1,1,1
+            on_press: app.root.current = "transaction_choice"

@@ -1,5 +1,8 @@
 import os
 from datetime import timedelta
+import datetime
+import jwt
+from flask import current_app
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
@@ -8,6 +11,8 @@ class Config:
     'sqlite:///' + os.path.join(basedir, 'maintenance.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
+
+
 
 
 

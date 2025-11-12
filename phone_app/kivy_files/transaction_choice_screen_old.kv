@@ -1,0 +1,40 @@
+<TransactionChoiceScreen>:
+    name: "transaction_choice"
+    BoxLayout:
+        orientation: "vertical"
+        spacing: 25
+        padding: 30
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: "Choose Transaction Type"
+            font_size: 28
+            bold: True
+            color: 0.1,0.1,0.1,1
+
+        Button:
+            text: "IN (Add to Stock)"
+            font_size: 24
+            background_color: 0.1, 0.6, 0.2, 1
+            color: 1,1,1,1
+            on_press: root.choose_in()
+
+        Button:
+            text: "OUT (Use / Remove Stock)"
+            font_size: 24
+            background_color: 0.8, 0.3, 0.1, 1
+            color: 1,1,1,1
+            on_press: root.choose_out()
+
+        Button:
+            text: "Cancel"
+            font_size: 20
+            size_hint_y: 0.15
+            background_color: 0.5,0.5,0.5,1
+            color: 1,1,1,1
+            on_press: app.root.current = "dashboard"

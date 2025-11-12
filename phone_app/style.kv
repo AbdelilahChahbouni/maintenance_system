@@ -1,0 +1,31 @@
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+
+<Button>:
+    font_size: 20
+    background_normal: ""
+    background_color: get_color_from_hex("#1C7ED6")   # Blue
+    color: 1,1,1,1
+    size_hint_y: None
+    height: 55
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10]
+
+<TextInput>:
+    font_size: 20
+    background_normal: ""
+    background_active: ""
+    background_color: get_color_from_hex("#E9ECEF")  # Light input
+    padding: 10
+    multiline: False
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [8]

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, flash, redirect, request
+from flask import Blueprint, render_template, url_for, flash, redirect, request , jsonify
 from app import db, bcrypt 
 from app.auth.forms import RegistrationForm, LoginForm , ResetPasswordForm , DeleteUserForm ,RequestResetForm , UpdateAccountForm , ChangePasswordForm ,UpdateUserStatusForm
 from app.models import User
@@ -6,7 +6,14 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from app import mail
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-from .utils import save_picture
+from .utils import save_picture , create_jwt_token
+from werkzeug.security import check_password_hash
+from app import create_app
+
+
+
+
+
 
 auth = Blueprint('auth', __name__, template_folder='templates/auth')
 
@@ -202,5 +209,37 @@ def change_password():
     return render_template('auth/change_password.html', title='Change Password', form=form)
 
 
+
+#API for login Phone App
+
+ # if you already created token generator
+
+@auth.route("/api/login", methods=["POST"])
+def api_login():
+    data = request.get_json()
+
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"success": False, "message": "Email and password are required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    # Use model method
+    if not user or not user.check_password(password):
+        return jsonify({"success": False, "message": "Invalid email or password"}), 401
+
+    # Create token
+    token = create_jwt_token(user.id)
+
+    return jsonify({
+        "success": True,
+        "message": "Login successful",
+        "token": token,
+        "user_id": user.id,
+        "username": user.username,
+        "role": user.role
+    }), 200
 
 

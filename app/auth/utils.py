@@ -2,6 +2,8 @@ import os
 import secrets
 from PIL import Image
 from flask import current_app
+import datetime
+import jwt
 
 
 def save_picture(form_picture):
@@ -15,3 +17,13 @@ def save_picture(form_picture):
     i.thumbnail(output_size)
     i.save(picture_path)
     return picture_fn
+
+
+def create_jwt_token(user_id):
+    payload = {
+        "user_id": user_id,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),  # Token valid 24h
+        "iat": datetime.datetime.utcnow()
+    }
+    token = jwt.encode(payload, current_app.config["SECRET_KEY"], algorithm="HS256")
+    return token

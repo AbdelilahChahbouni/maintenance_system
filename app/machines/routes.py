@@ -76,3 +76,47 @@ def delete_machine(id):
     db.session.commit()
     flash("Machine deleted successfully!", "danger")
     return redirect(url_for("machines.list_machines"))
+
+# API 
+
+from flask import request, jsonify
+import jwt
+from functools import wraps
+from config import Config
+from datetime import datetime
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        # Token expected in Authorization header
+        if "Authorization" in request.headers:
+            auth_header = request.headers["Authorization"]
+            if auth_header.startswith("Bearer "):
+                token = auth_header.split(" ")[1]
+
+        if not token:
+            return jsonify({"success": False, "message": "Token is missing!"}), 401
+
+        try:
+            data = jwt.decode(token, Config.SECRET_KEY, algorithms=["HS256"])  # ✅ FIXED
+            current_user_id = data["user_id"]
+        except Exception:
+            return jsonify({"success": False, "message": "Token is invalid!"}), 401
+
+        return f(current_user_id, *args, **kwargs)
+    return decorated
+
+
+
+
+@machines.route("/api/machines", methods=["GET"])
+@token_required
+def get_machines(current_user_id):
+    machines = Machine.query.all()
+    data = [
+        {"id": machine.id, "name": machine.name}
+        for machine in machines
+    ]
+    return jsonify(data), 200

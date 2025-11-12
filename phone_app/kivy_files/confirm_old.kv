@@ -1,0 +1,55 @@
+<ConfirmScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 30
+        spacing: 20
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.95, 0.95, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Label:
+            text: "Confirm Transaction"
+            font_size: 28
+            bold: True
+            size_hint_y: None
+            height: 50
+
+        TextInput:
+            id: part_id_input
+            hint_text: "Part ID"
+            font_size: 20
+            size_hint_y: None
+            height: 50
+
+        TextInput:
+            id: quantity_input
+            hint_text: "Quantity"
+            font_size: 20
+            size_hint_y: None
+            height: 50
+
+        BoxLayout:
+            id: machine_box
+            orientation: "vertical"
+            size_hint_y: None
+            height: 50
+
+            Spinner:
+                id: machine_spinner
+                text: "Select Machine"
+                size_hint_y: None
+                height: 45
+                background_color: 0.9,0.9,0.9,1
+                color: 0,0,0,1
+
+        Button:
+            text: "Submit"
+            font_size: 22
+            size_hint_y: None
+            height: 50
+            background_color: 0.1, 0.5, 0.8, 1
+            color: 1,1,1,1
+            on_press: root.submit()

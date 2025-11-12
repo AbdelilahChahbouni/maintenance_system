@@ -2,9 +2,10 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request 
 from app import db
 from app.models import SparePart , Transaction , Machine , User
 from .forms import SparePartForm , TransactionForm
-from flask_login import current_user , login_required
+from flask_login import current_user , login_required 
 from datetime import datetime
 from app.utils import export_to_pdf , generate_qr_for_part
+from config import Config
 
 stock = Blueprint("stock", __name__)
 
@@ -362,3 +363,136 @@ def confirm_transaction_in(part_id):
         return redirect(url_for("stock.list_stock"))
 
     return render_template("stock/confirm_transaction_in.html", part=part)
+
+
+
+
+#API 
+from flask import request, jsonify
+import jwt
+from functools import wraps
+from config import Config
+from datetime import datetime
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        # Token expected in Authorization header
+        if "Authorization" in request.headers:
+            auth_header = request.headers["Authorization"]
+            if auth_header.startswith("Bearer "):
+                token = auth_header.split(" ")[1]
+
+        if not token:
+            return jsonify({"success": False, "message": "Token is missing!"}), 401
+
+        try:
+            data = jwt.decode(token, Config.SECRET_KEY, algorithms=["HS256"])  # ✅ FIXED
+            current_user_id = data["user_id"]
+        except Exception:
+            return jsonify({"success": False, "message": "Token is invalid!"}), 401
+
+        return f(current_user_id, *args, **kwargs)
+    return decorated
+
+
+
+
+
+
+@stock.route("/api/transaction/out", methods=["POST"])
+@token_required
+def api_transaction_out(current_user_id):
+    data = request.json
+
+    part_id = data.get("part_id")
+    quantity = int(data.get("quantity", 1))
+    machine_id = data.get("machine_id")
+
+    part = SparePart.query.get(part_id)
+    machine = Machine.query.get(machine_id)
+
+    if not part:
+        return jsonify({"success": False, "message": "Part not found"}), 404
+
+    if part.quantity < quantity:
+        return jsonify({"success": False, "message": "Not enough quantity"}), 400
+
+    # Update stock
+    part.quantity -= quantity
+
+    # Save transaction
+    transaction = Transaction(
+        part_id=part.id,
+        machine_id=machine.id,
+        user_id=current_user_id,  # ✅ token user ID used
+        quantity_used=quantity,
+    )
+
+    db.session.add(transaction)
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Transaction OUT recorded successfully"})
+
+
+
+@stock.route("/api/transaction/in", methods=["POST"])
+@token_required
+def api_transaction_in(current_user_id):
+    data = request.json
+
+    part_id = int(data.get("part_id"))
+    quantity = int(data.get("quantity", 1))
+    machine_id = data.get("machine_id")  # Optional for IN
+
+    part = SparePart.query.get(part_id)
+
+    if not part:
+        return jsonify({"success": False, "message": "Part not found"}), 404
+
+    # ✅ Increase quantity for IN transaction
+    part.quantity += quantity
+
+    # transaction = Transaction(
+    #     part_id=part.id,
+    #     # machine_id=machine_id if machine_id else None,  # allow null
+    #     user_id=current_user_id,
+    #     quantity_used=-quantity,     # negative for IN
+    #     # transaction_type="IN"        # ✅ If your model uses this field
+    # )
+
+    db.session.add(part)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Transaction IN recorded successfully"
+    }), 200
+
+
+@stock.route("/api/part/<string:qr_data>", methods=["GET"])
+@token_required
+def api_get_part(current_user_id, qr_data):
+    # QR scanned format: PART:ID → extract ID
+    if qr_data.startswith("PART:"):
+        part_id = qr_data.split(":")[1]
+    else:
+        return jsonify({"success": False, "message": "Invalid QR format"}), 400
+
+    part = SparePart.query.get(part_id)
+
+    if not part:
+        return jsonify({"success": False, "message": "Part not found"}), 404
+
+    return jsonify({
+        "success": True,
+        "part": {
+            "id": part.id,
+            "name": part.name,
+            "part_number": part.part_number,
+            "quantity": part.quantity,
+        }
+    }), 200
+

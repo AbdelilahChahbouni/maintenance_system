@@ -1,0 +1,60 @@
+<TransactionChoiceScreen>:
+    name: "transaction_choice"
+
+    FloatLayout:
+        canvas.before:
+            Color:
+                rgba: 0.95, 0.96, 0.98, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            orientation: "vertical"
+            size_hint: 0.85, 0.6
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            spacing: 25
+            padding: 25
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [25]
+
+            Label:
+                text: "Choose Transaction Type"
+                font_size: 26
+                bold: True
+                color: 0.2, 0.2, 0.3, 1
+
+            Button:
+                text: "IN (Add to Stock)"
+                font_size: 20
+                background_normal: ""
+                background_color: (0.3, 0.7, 0.4, 1)
+                color: 1, 1, 1, 1
+                height: 55
+                radius: [25]
+                on_press: root.choose_in()
+
+            Button:
+                text: "OUT (Use / Remove Stock)"
+                font_size: 20
+                background_normal: ""
+                background_color: (0.2, 0.6, 0.9, 1)
+                color: 1, 1, 1, 1
+                height: 55
+                radius: [25]
+                on_press: root.choose_out()
+
+            Button:
+                text: "Cancel"
+                font_size: 18
+                background_normal: ""
+                background_color: (0.8, 0.8, 0.8, 1)
+                color: 0.2, 0.2, 0.3, 1
+                height: 50
+                radius: [25]
+                on_press: app.root.current = "dashboard"
