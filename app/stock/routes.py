@@ -6,6 +6,8 @@ from flask_login import current_user , login_required
 from datetime import datetime
 from app.utils import export_to_pdf , generate_qr_for_part
 from config import Config
+import cv2
+import numpy as np
 
 stock = Blueprint("stock", __name__)
 
@@ -455,14 +457,6 @@ def api_transaction_in(current_user_id):
     # ✅ Increase quantity for IN transaction
     part.quantity += quantity
 
-    # transaction = Transaction(
-    #     part_id=part.id,
-    #     # machine_id=machine_id if machine_id else None,  # allow null
-    #     user_id=current_user_id,
-    #     quantity_used=-quantity,     # negative for IN
-    #     # transaction_type="IN"        # ✅ If your model uses this field
-    # )
-
     db.session.add(part)
     db.session.commit()
 
@@ -496,3 +490,34 @@ def api_get_part(current_user_id, qr_data):
         }
     }), 200
 
+
+@stock.route('/api/scan_qr', methods=['POST'])
+@token_required
+def scan_qr(current_user_id=None):
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+        
+    try:
+        # Read image file into numpy array
+        filestr = file.read()
+        npimg = np.frombuffer(filestr, np.uint8)
+        img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+        
+        if img is None:
+             return jsonify({"error": "Failed to decode image"}), 400
+        # Detect QR
+        qcd = cv2.QRCodeDetector()
+        retval, decoded_info, points, straight_qrcode = qcd.detectAndDecodeMulti(img)
+        
+        if retval and decoded_info:
+            # decoded_info is a tuple of strings, take the first one
+            qr_text = decoded_info[0] if isinstance(decoded_info, tuple) else decoded_info
+            return jsonify({"qr_data": qr_text})
+        else:
+            return jsonify({"error": "No QR code found"}), 404
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
